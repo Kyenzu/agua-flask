@@ -10,7 +10,7 @@ model = load("decision_tree_model.joblib")
 api = Flask(__name__)
 CORS(api)
 
-@api.route('/api/hfp_prediction', methods=['POST'])
+@api.route('/hfp_prediction', methods=['POST'])
 def predict_heart_failure():
     data = request.json['inputs']
     input_df = pd.DataFrame(data)
