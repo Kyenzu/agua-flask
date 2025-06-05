@@ -64,7 +64,53 @@
 
     <div id="result" class="mt-4 text-center"></div>
   </div>
-  
-  <script src="script.js"></script>
+
+<script>
+  document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const inputData = {
+      "inputs": [
+        {
+          "Pregnancies": parseInt(document.getElementById("pregnancies").value),
+          "Glucose": parseFloat(document.getElementById("glucose").value),
+          "BloodPressure": parseFloat(document.getElementById("bloodPressure").value),
+          "SkinThickness": parseFloat(document.getElementById("skinThickness").value),
+          "Insulin": parseFloat(document.getElementById("insulin").value),
+          "BMI": parseFloat(document.getElementById("bmi").value),
+          "DiabetesPedigreeFunction": parseFloat(document.getElementById("dpf").value),
+          "Age": parseInt(document.getElementById("age").value)
+        }
+      ]
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/api/hfp_prediction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(inputData)
+      });
+
+      const result = await response.json();
+      const prediction = result.prediction[0]; // should return something like { Positive: 0.76, Negative: 0.24 }
+
+      // Determine the final result
+      const isPositive = prediction.Positive > prediction.Negative;
+
+      const message = isPositive
+        ? `<h4 class="text-danger">Prediction Result: <strong>Yes</strong></h4><p>This means the person is likely to have diabetes.</p>`
+        : `<h4 class="text-success">Prediction Result: <strong>No</strong></h4><p>This means the person is not likely to have diabetes.</p>`;
+
+      document.getElementById("result").innerHTML = message;
+
+    } catch (error) {
+      console.error("Error:", error);
+      document.getElementById("result").innerHTML =
+        "<p class='text-danger'>Prediction failed. Please try again later.</p>";
+    }
+  });
+</script>
+
+
 </body>
 </html>
